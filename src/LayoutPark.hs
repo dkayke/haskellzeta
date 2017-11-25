@@ -73,6 +73,30 @@ bodySec' section secroute =
                     <div class="page-content" >
                         ^{section}
     |]
+    
+bodyLogin' :: Widget -> Widget
+bodyLogin' section = 
+    [whamlet|
+        <div class="layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+            <main class="main main-login mdl-layout__content">
+                <div class="container container-login mdl-grid">
+                    <div class="content content-login mdl-cell mdl-cell-login mdl-cell--12-col">
+                        <div class="mdl-cell mdl-cell-login mdl-cell--12-col">
+                            <span class="mdl-layout-title"><img src=@{StaticR img_logo_png}> HaskPark
+                    
+                    <div class="content content-login mdl-color--white mdl-shadow--4dp mdl-color-text--grey-800 mdl-cell mdl-cell-login mdl-cell--12-col">
+                        <div class="mdl-cell mdl-cell-login mdl-cell--12-col">
+                            <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                                
+                                <div class="mdl-tabs__tab-bar">
+                                    <span class="mdl-tabs__tab is-active">Login
+                                    
+                                <div class="mdl-tabs__panel is-active" id="login">
+                                    ^{section}
+                                    
+                                <footer class="content content-login mdl-cell mdl-cell-login mdl-cell--12-col text-center">
+                                    <div class="mdl-cell mdl-cell-login mdl-cell--12-col">HaskPark 2017 - Sobre nós 
+    |]
 
 layoutPark :: Widget -> Handler Html
 layoutPark widget = defaultLayout $ do
@@ -83,3 +107,13 @@ layoutParkSec :: Widget -> String -> Handler Html
 layoutParkSec widget backpage = defaultLayout $ do
     head' 
     bodySec' widget backpage
+
+layoutLogin :: Widget -> Handler Html
+layoutLogin widget = defaultLayout $ do
+    toWidget $ [cassius|
+        .layout
+            background-size:cover;
+            background-image: url( @{StaticR img_wallpaper_login_png} );
+    |]
+    head' 
+    bodyLogin' widget
