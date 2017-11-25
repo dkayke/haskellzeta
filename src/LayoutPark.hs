@@ -7,7 +7,14 @@
 module LayoutPark where
 
 import Import
-    
+
+sndRote ::  String -> (Widget, String)
+sndRote "CadClienteR"    = ([whamlet| @{CadastroR} |]  , "Cadastro de cliente")
+sndRote "CadVeiculoR"    = ([whamlet| @{CadastroR} |]  , "Cadastro de veiculo")
+sndRote "BuscaClienteR"  = ([whamlet| @{CadastroR} |]  , "Busca de cliente")
+sndRote "BuscaVeiculoR"  = ([whamlet| @{CadastroR} |]  , "Busca de veiculo")
+sndRote _ = ([whamlet| / |], "HaskPark")
+
 head' :: Widget
 head' =  do
     setTitle "HaskPark"
@@ -48,7 +55,31 @@ body' section =
                         ^{section}
     |]
 
+bodySec' :: Widget -> String -> Widget
+bodySec' section secroute =
+    [whamlet|
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+            <header class="mdl-layout__header">
+                <div class="title mdl-color--light-blue-900">
+                    <span class="mdl-layout-title">
+                        <a href=^{fst (sndRote secroute)}>
+                            <i class="material-icons">&#xE5C4;
+                        <span class="mdl-layout-title">
+                            <img src=@{StaticR img_logo_png}> HaskPark
+                <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--light-blue-800">
+                    <span class="mdl-layout__tab is-active">#{snd (sndRote secroute)}
+            <main class="mdl-layout__content page">
+                <section class="mdl-layout__tab-panel is-active">
+                    <div class="page-content" >
+                        ^{section}
+    |]
+
 layoutPark :: Widget -> Handler Html
 layoutPark widget = defaultLayout $ do
     head' 
     body' widget 
+
+layoutParkSec :: Widget -> String -> Handler Html
+layoutParkSec widget backpage = defaultLayout $ do
+    head' 
+    bodySec' widget backpage
