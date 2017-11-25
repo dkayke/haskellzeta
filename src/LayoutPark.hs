@@ -51,4 +51,4 @@ body' section =
 layoutPark :: Widget -> Handler Html
 layoutPark widget = defaultLayout $ do
     head' 
-    body' widget
+    body' widget 
