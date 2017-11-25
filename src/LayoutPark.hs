@@ -55,10 +55,11 @@ body' section =
                         ^{section}
     |]
 
-bodySec' :: Widget -> String -> Widget
-bodySec' section secroute =
+bodySec' :: String -> Widget -> Widget
+bodySec' secroute section =
     [whamlet|
         <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+            
             <header class="mdl-layout__header">
                 <div class="title mdl-color--light-blue-900">
                     <span class="mdl-layout-title">
@@ -68,6 +69,7 @@ bodySec' section secroute =
                             <img src=@{StaticR img_logo_png}> HaskPark
                 <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--light-blue-800">
                     <span class="mdl-layout__tab is-active">#{snd (sndRote secroute)}
+                    
             <main class="mdl-layout__content page">
                 <section class="mdl-layout__tab-panel is-active">
                     <div class="page-content" >
@@ -103,10 +105,10 @@ layoutPark widget = defaultLayout $ do
     head' 
     body' widget 
 
-layoutParkSec :: Widget -> String -> Handler Html
-layoutParkSec widget backpage = defaultLayout $ do
+layoutParkSec :: String -> Widget -> Handler Html
+layoutParkSec backpage widget = defaultLayout $ do
     head' 
-    bodySec' widget backpage
+    bodySec' backpage widget
 
 layoutLogin :: Widget -> Handler Html
 layoutLogin widget = defaultLayout $ do
