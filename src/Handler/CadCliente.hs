@@ -39,4 +39,11 @@ getCadClienteR = do
         |]
 
 postCadClienteR :: Handler Html
-postCadClienteR = undefined 
+postCadClienteR = do 
+    ((res,_),_) <- runFormPost formCliente
+    case res of 
+        FormSuccess cliente -> do 
+            _ <- runDB $ insert cliente
+            setMessage $ [shamlet| Cliente cadastrado com sucesso |]
+            redirect CadClienteR
+        _ -> redirect CadClienteR 
