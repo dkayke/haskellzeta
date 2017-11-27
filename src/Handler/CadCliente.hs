@@ -20,7 +20,23 @@ formCliente = renderDivs $ Cliente
     <*> aopt intField "Telefone 2 " Nothing
 
 getCadClienteR :: Handler Html
-getCadClienteR = undefined
+getCadClienteR = do 
+    (widgetCli,enctype) <- generateFormPost formCliente
+    msg <- getMessage
+    layoutParkSec "CadClienteR" 
+        [whamlet|
+            <nav>
+                <div class="breadcrumb">
+                    <div class="col s12 mdl-color--grey-100">
+                        <span>HaskPark /
+                        <a href=@{CadastroR}>Cadastro <span>/
+                        <a>Cliente
+             $maybe mensagem <- msg 
+                <h1> #{mensagem}
+            <form action=@{CadClienteR} method=post>
+                ^{widgetCli}
+                    <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Cadastrar cliente
+        |]
 
 postCadClienteR :: Handler Html
-postCadClienteR = undefined
+postCadClienteR = undefined 
