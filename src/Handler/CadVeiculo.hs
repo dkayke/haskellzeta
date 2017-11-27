@@ -22,7 +22,23 @@ formVeiculo = renderDivs $ (,) <$> (Veiculo
     <*> areq intField "CNH do Motorista" Nothing
     
 getCadVeiculoR :: Handler Html
-getCadVeiculoR = undefined
+getCadVeiculoR = do 
+    (widgetVeic,enctype) <- generateFormPost formVeiculo
+    msg <- getMessage
+    layoutParkSec "CadVeiculoR" 
+        [whamlet|
+            <nav>
+                <div class="breadcrumb">
+                    <div class="col s12 mdl-color--grey-100">
+                        <span>HaskPark /
+                        <a href=@{CadastroR}>Cadastro <span>/
+                        <a>Veiculo
+             $maybe mensagem <- msg 
+                <h1> #{mensagem}
+            <form action=@{CadVeiculoR} enctype=#{enctype} method=post>
+                ^{widgetVeic}
+                    <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Cadastrar veiculo
+        |]
 
 postCadVeiculoR :: Handler Html
 postCadVeiculoR = undefined
