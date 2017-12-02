@@ -1,0 +1,48 @@
+Usuario
+    nome                Text
+    login               Text
+    senha               Text
+    UniqueLogin         login
+    deriving Show
+    
+Cliente
+    nome                Text
+    cnh                 Int
+    cpf                 Int
+    dt_nascimento       Day Maybe
+    telefone_1          Int Maybe
+    telefone_2          Int Maybe
+    deriving Show
+    
+Veiculo
+    tipoveic            TipoveiculoId
+    placa               Text
+    ufplaca             Text
+    clienteid           ClienteId
+    modelo              Text Maybe
+    ano                 Int Maybe
+    cor                 Text Maybe
+    deriving Show
+    
+Tipoveiculo
+    nome                Text
+    deriving Show
+    
+Entrada
+    clienteid           ClienteId
+    veiculoid           VeiculoId
+    hrentrada           UTCTime
+
+Saida
+    clienteid           ClienteId
+    veiculoid           VeiculoId
+    hrentrada           UTCTime
+    hrsaida             UTCTime
+    vltotal             Double
+    
+Negocio
+    vlhora              Double
+    vlmeiahora          Double
+    vldiario            Double
+    vldemais            Double
+    
