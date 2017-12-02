@@ -14,8 +14,15 @@ import Data.Time.LocalTime
 import System.IO.Unsafe
 import Database.Persist.Postgresql
 
+formEntrada :: Form (Int, Text)
+formEntrada = renderDivs $ (,)
+    <$> areq intField "CNH" Nothing
+    <*> areq textField "Placa do Veículo" Nothing
+
 getEntradaR :: Handler Html -- entrando com formulario 
 getEntradaR = do 
+    (widget,enctype) <- generateFormPost formEntrada
+    msg <- getMessage
     layoutPark $ do 
         [whamlet|
             <nav>
@@ -28,9 +35,9 @@ getEntradaR = do
                 $maybe mensagem <- msg 
                     <p> #{mensagem}
             <form action=@{EntradaR} enctype=#{enctype} method=post>
+                ^{widget}
                 <button type="submit" value="entrada" class="mdl-button mdl-button-login mdl-js-button mdl-button--raised">Entrar
         |]
         
-
 postEntradaR :: Handler Html
-postEntradaR = undefined
+postEntradaR = undefined 
