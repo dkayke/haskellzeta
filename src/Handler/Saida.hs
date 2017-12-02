@@ -61,5 +61,19 @@ getSaidaLiR = do
                                     <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Saída
         |]
 
-postSaidaDeR :: Handler Html
-postSaidaDeR = undefined
+postSaidaDeR :: EntradaId -> Handler Html 
+postSaidaDeR locsid = do
+    hrsaida  <- liftIO getCurrentTime
+    entrada <- runDB $ selectFirst [EntradaId ==. locsid] []
+    case entrada of 
+        Nothing -> do 
+            setMessage $ [shamlet| Usuario e/ou senha invalido. |]
+            redirect LoginR 
+        Just (Entity entrid (Entrada cliid veiid hrentr)) -> do
+            _ <- runDB $ insert $ Saida (cliid)
+                                        (veiid)
+                                        (hrentr)
+                                        (hrsaida)
+                                        (0)
+            runDB $ delete locsid
+            redirect SaidaLiR
