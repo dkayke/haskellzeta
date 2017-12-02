@@ -40,4 +40,17 @@ getEntradaR = do
         |]
         
 postEntradaR :: Handler Html
-postEntradaR = undefined 
+postEntradaR = do 
+    ((res,_),_) <- runFormPost formEntrada
+    dthora <- liftIO getCurrentTime
+    case res of 
+        FormSuccess (cnh, placa) -> do 
+            Just cnhcli <- runDB $ selectFirst [ClienteCnh ==. cnh][]
+            Just placaveic <- runDB $ selectFirst [VeiculoPlaca ==. placa][]
+            _ <- runDB $ insert $ Entrada (entityKey cnhcli) 
+                                          (entityKey placaveic)
+                                          (dthora)
+            setMessage $ [shamlet| Entrada efetuada |]
+            redirect EntradaR
+        _ -> redirect EntradaR
+    
