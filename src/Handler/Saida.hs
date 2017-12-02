@@ -12,8 +12,28 @@ import Data.Time.LocalTime
 import LayoutPark
 import System.IO.Unsafe
 
+cliById :: ClienteId -> Widget
+cliById cid = do 
+    cli <- handlerToWidget $ runDB $ get404 cid
+    [whamlet|
+        <td class="mdl-data-table__cell--non-numeric">
+            #{clienteNome cli}
+        <td class="mdl-data-table__cell--non-numeric">    
+            #{clienteCnh cli}
+    |]
+
+veicById :: VeiculoId -> Widget
+veicById vid = do 
+    veic <- handlerToWidget $ runDB $ get404 vid
+    [whamlet|
+        <td class="mdl-data-table__cell--non-numeric">
+            #{veiculoPlaca veic}
+    |]
+
 getSaidaLiR :: Handler Html
 getSaidaLiR = do 
+    locacoes <- runDB $ selectList [] [] :: Handler [Entity Entrada]
+    layoutPark $ do 
         [whamlet|
             <nav>
                 <div class="breadcrumb">
@@ -32,11 +52,13 @@ getSaidaLiR = do
                         <th class="mdl-data-table__cell--non-numeric">CNH
                         <th class="mdl-data-table__cell--non-numeric">Ação
                 <tbody>
-                    <td> teste
-                    <td> teste
-                    <td> teste
-                    <td> teste
-                   <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Saída
+                    $forall (Entity locsid entrada) <- locacoes
+                        <tr>
+                            ^{veicById $ entradaVeiculoid entrada}
+                            ^{cliById $ entradaClienteid entrada}
+                            <td class="mdl-data-table__cell--non-numeric">
+                                <form action=@{SaidaDeR locsid} method=post>
+                                    <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Saída
         |]
 
 postSaidaDeR :: Handler Html
