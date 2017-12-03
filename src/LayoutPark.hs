@@ -13,6 +13,7 @@ sndRote "CadClienteR"    = ([whamlet| @{CadastroR} |]  , "Cadastro de cliente")
 sndRote "CadVeiculoR"    = ([whamlet| @{CadastroR} |]  , "Cadastro de veiculo")
 sndRote "BuscaClienteR"  = ([whamlet| @{CadastroR} |]  , "Busca de cliente")
 sndRote "BuscaVeiculoR"  = ([whamlet| @{CadastroR} |]  , "Busca de veiculo")
+sndRote "ImpressaoSaR"   = ([whamlet| @{SaidaLiR}  |]  , "Impressão de ticket de saída")
 sndRote _ = ([whamlet| / |], "HaskPark")
 
 head' :: Widget
@@ -21,6 +22,27 @@ head' =  do
     addStylesheet $ (StaticR css_material_min_css)
     addStylesheet $ (StaticR css_estilo_css)
     addScriptRemote "https://code.getmdl.io/1.3.0/material.min.js"
+    toWidget
+        [julius|
+            function searchInTable() {
+                var input, filter, table, tr, td, i;
+                input = document.getElementById("searchInput");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("searchTable");
+                tr = table.getElementsByTagName("tr");
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[0];
+                    if (td) {
+                        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } 
+                        else {
+                            tr[i].style.display = "none";
+                        }
+                    }       
+                }
+            }
+        |]
     toWidgetHead
         [hamlet|
             <meta charset="utf-8">
@@ -43,12 +65,16 @@ body' section =
             
                 <div class="title mdl-color--light-blue-900">
                     <span class="mdl-layout-title"><img src=@{StaticR img_logo_png}> HaskPark
-                
+                    <span class="username">Nome do usuario | 
+                        <form action=@{LogoutR} method=post>
+                            <input type="submit" value="Sair">
+
                 <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--light-blue-800">
-                    <a href=@{EntradaR}    class="mdl-layout__tab">Entrada
-                    <a href=@{SaidaR}      class="mdl-layout__tab">Saída
-                    <a href=@{CadastroR}   class="mdl-layout__tab">Cadastro
-                    <a href=@{NegocioR}    class="mdl-layout__tab">Negócio
+                    <a href=@{EntradaR}     class="mdl-layout__tab">Entrada
+                    <a href=@{SaidaLiR}     class="mdl-layout__tab">Saída
+                    <a href=@{CadastroR}    class="mdl-layout__tab">Cadastro
+                    <a href=@{NegocioR}     class="mdl-layout__tab">Negócio
+                
             <main class="mdl-layout__content page">
                 <section class="mdl-layout__tab-panel is-active">
                     <div class="page-content">
@@ -76,6 +102,28 @@ bodySec' secroute section =
                         ^{section}
     |]
     
+bodyTicket' :: String -> Widget -> Widget
+bodyTicket' secroute section =
+    [whamlet|
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+            <header>
+                <div class="title">
+                    <span class="mdl-layout-title">
+                        <a href=^{fst (sndRote secroute)}>
+                            <i class="material-icons-ticket">&#xE5C4;
+                        <span class="mdl-layout-title">
+                            <img src=@{StaticR img_logo_png}> HaskPark
+                    
+            <main class="mdl-layout__content page">
+                <section class="mdl-layout__tab-panel is-active">
+                    <div class="page-content">
+                        <div id="printable">
+                            ^{section}
+                            <button onclick="print()" class="mdl-button mdl-js-button mdl-button--raised bt-acao">Imprimir
+                            <a href=^{fst (sndRote secroute)}>
+                                <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Cancelar
+    |]
+
 bodyLogin' :: Widget -> Widget
 bodyLogin' section = 
     [whamlet|
@@ -100,10 +148,10 @@ bodyLogin' section =
                                     <div class="mdl-cell mdl-cell-login mdl-cell--12-col">HaskPark 2017 - Sobre nós 
     |]
 
-layoutPark :: Widget -> Handler Html
-layoutPark widget = defaultLayout $ do
+layoutTicket :: String -> Widget -> Handler Html
+layoutTicket backpage widget = defaultLayout $ do
     head' 
-    body' widget 
+    bodyTicket' backpage widget 
 
 layoutParkSec :: String -> Widget -> Handler Html
 layoutParkSec backpage widget = defaultLayout $ do
@@ -119,3 +167,8 @@ layoutLogin widget = defaultLayout $ do
     |]
     head' 
     bodyLogin' widget
+    
+layoutPark :: Widget -> Handler Html
+layoutPark widget = defaultLayout $ do
+    head' 
+    body' widget 
