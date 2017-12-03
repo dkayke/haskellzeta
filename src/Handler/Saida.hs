@@ -68,10 +68,18 @@ utcToMinutes a b =  (diffUTCTime  b a) / 60
 trunc :: Double -> Int -> Double
 trunc x n = (fromIntegral (floor (x * t))) / t
     where t = 10^n
-    
+
+valor :: Double -> Double -> Double -> NominalDiffTime -> Double
+valor vlMeia vlHora vlDemais minutos
+    | round (minutos) <= 30 && minutos > 0 = trunc vlMeia 2
+    | round (minutos) <= 60 && minutos >= 31 = trunc vlHora 2
+    | round (minutos) > 60 = trunc (realToFrac ((minutos / 60) * (realToFrac vlDemais :: NominalDiffTime) + (realToFrac vlHora :: NominalDiffTime)) :: Double) 2
+    | otherwise = 0
+
 postSaidaDeR :: EntradaId -> Handler Html 
 postSaidaDeR locsid = do
     hrsaida  <- liftIO getCurrentTime
+    Just negocio <- runDB $ selectFirst [][]
     entrada <- runDB $ selectFirst [EntradaId ==. locsid] []
     case entrada of 
         Nothing -> do 
@@ -82,6 +90,11 @@ postSaidaDeR locsid = do
                                         (veiid) 
                                         (hrentr) 
                                         (hrsaida) 
-                                        (0)
+                                        ( valor 
+                                            (negocioVlmeiahora . entityVal $ negocio)
+                                            (negocioVlhora . entityVal $ negocio)
+                                            (negocioVldemais . entityVal $ negocio)
+                                            (utcToMinutes hrentr hrsaida)
+                                        )
             runDB $ delete locsid
             redirect SaidaLiR
