@@ -11,6 +11,13 @@ import LayoutPark
 import Control.Exception.Base
 import Data.Time.Format
 
+tipoVeicTicket :: TipoveiculoId -> Widget
+tipoVeicTicket tvid = do 
+    tvei <- handlerToWidget $ runDB $ get404 tvid
+    [whamlet|
+        <p>Tipo:&nbsp;&nbsp;  #{tipoveiculoNome tvei}
+    |]
+
 veiTicket :: VeiculoId -> Widget
 veiTicket vid = do 
     vei <- handlerToWidget $ runDB $ get404 vid
