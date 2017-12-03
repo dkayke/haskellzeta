@@ -29,7 +29,7 @@ veicById vid = do
         <td class="mdl-data-table__cell--non-numeric">
             #{veiculoPlaca veic}
     |]
-
+    
 getSaidaLiR :: Handler Html
 getSaidaLiR = do 
     locacoes <- runDB $ selectList [] [] :: Handler [Entity Entrada]
@@ -61,6 +61,10 @@ getSaidaLiR = do
                                     <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Saída
         |]
 
+
+utcToMinutes :: UTCTime -> UTCTime -> NominalDiffTime
+utcToMinutes a b =  (diffUTCTime  b a) / 60
+
 postSaidaDeR :: EntradaId -> Handler Html 
 postSaidaDeR locsid = do
     hrsaida  <- liftIO getCurrentTime
@@ -70,10 +74,10 @@ postSaidaDeR locsid = do
             setMessage $ [shamlet| Usuario e/ou senha invalido. |]
             redirect LoginR 
         Just (Entity entrid (Entrada cliid veiid hrentr)) -> do
-            _ <- runDB $ insert $ Saida (cliid)
-                                        (veiid)
-                                        (hrentr)
-                                        (hrsaida)
+            _ <- runDB $ insert $ Saida (cliid) 
+                                        (veiid) 
+                                        (hrentr) 
+                                        (hrsaida) 
                                         (0)
             runDB $ delete locsid
             redirect SaidaLiR
