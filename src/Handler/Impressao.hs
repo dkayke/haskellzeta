@@ -11,6 +11,15 @@ import LayoutPark
 import Control.Exception.Base
 import Data.Time.Format
 
+veiTicket :: VeiculoId -> Widget
+veiTicket vid = do 
+    vei <- handlerToWidget $ runDB $ get404 vid
+    [whamlet|
+        <p class="title-ticket">VEICULO
+        ^{tipoVeicTicket $ veiculoTipoveic vei}
+        <p>Placa:&nbsp; #{veiculoPlaca vei}
+    |]
+
 cliTicket :: ClienteId -> Widget
 cliTicket cid = do 
     cli <- handlerToWidget $ runDB $ get404 cid
@@ -29,6 +38,7 @@ getImpressaoSaR sid = do
                 <b>HASK PARK
             $maybe (Entity said ticket) <- imp 
                 ^{cliTicket $ saidaClienteid ticket}
+                ^{veiTicket $ saidaVeiculoid ticket}
                 <p class="title-ticket">HORÁRIOS
                 <p>Entrada:&nbsp; #{(formatTime defaultTimeLocale "%d/%m/%Y às %T" (saidaHrentrada ticket))}
                 <p>Saída:&nbsp;&nbsp;&nbsp;   #{(formatTime defaultTimeLocale "%d/%m/%Y às %T" (saidaHrsaida ticket))}
