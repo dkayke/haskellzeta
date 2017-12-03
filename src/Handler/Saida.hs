@@ -65,6 +65,10 @@ getSaidaLiR = do
 utcToMinutes :: UTCTime -> UTCTime -> NominalDiffTime
 utcToMinutes a b =  (diffUTCTime  b a) / 60
 
+trunc :: Double -> Int -> Double
+trunc x n = (fromIntegral (floor (x * t))) / t
+    where t = 10^n
+    
 postSaidaDeR :: EntradaId -> Handler Html 
 postSaidaDeR locsid = do
     hrsaida  <- liftIO getCurrentTime
