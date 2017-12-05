@@ -26,11 +26,22 @@ type Form a = Html -> MForm Handler (FormResult a, Widget)
 instance Yesod App where
     makeLogger = return . appLogger
     authRoute _ = Just $ LoginR
-    isAuthorized LoginR _ = return Authorized
-    isAuthorized LogoutR _ = return Authorized
-    isAuthorized EntradaR _ = ehUsuario
+    isAuthorized CadUsuarioR    _ = isRoot
+    isAuthorized NegocioR       _ = isRoot
+    isAuthorized BuscaR         _ = isUser
+    isAuthorized CadastroR      _ = isUser
+    isAuthorized CadClienteR    _ = isUser
+    isAuthorized CadVeiculoR    _ = isUser
+    isAuthorized EntradaR       _ = isUser
+    isAuthorized (ImpressaoR _) _ = isUser
+    isAuthorized (ResultadoR _) _ = isUser
+    isAuthorized ResultadoPR    _ = isUser
+    isAuthorized SaidaLiR       _ = isUser
+    isAuthorized (SaidaDeR _)   _ = isUser
     isAuthorized _ _ = return Authorized
-    --isAuthorized _ _ = ehUsuario
+    errorHandler NotFound = fmap toTypedContent $ defaultLayout $ do
+        redirect Erro404R
+    errorHandler other = defaultErrorHandler other
 
 isRoot :: Handler AuthResult
 isRoot = do
@@ -46,6 +57,13 @@ isUser = do
     case sessao of 
         Nothing -> return AuthenticationRequired
         (Just "root") -> return $ Unauthorized "Proibido ao usuário root!" 
+        (Just _) -> return Authorized
+        
+isLogged :: Handler AuthResult
+isLogged = do
+    sessao <- lookupSession "_ID"
+    case sessao of 
+        Nothing -> redirect LoginR
         (Just _) -> return Authorized
         
 instance YesodPersist App where
