@@ -23,4 +23,4 @@ getBuscaR :: Handler Html
 getBuscaR = undefined
 
 postBuscaR :: Handler Html
-postBuscaR = undefined
+postBuscaR = undefined 
