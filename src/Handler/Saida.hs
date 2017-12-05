@@ -7,10 +7,10 @@
 module Handler.Saida where
 
 import Import
-import Data.Time.Clock
-import Data.Time.LocalTime
 import LayoutPark
-import System.IO.Unsafe
+import Data.Time.Clock
+import Data.Maybe
+import Database.Persist
 
 cliById :: ClienteId -> Widget
 cliById cid = do 
@@ -29,12 +29,17 @@ veicById vid = do
         <td class="mdl-data-table__cell--non-numeric">
             #{veiculoPlaca veic}
     |]
-    
+
 getSaidaLiR :: Handler Html
 getSaidaLiR = do 
+    msg <- getMessage
     locacoes <- runDB $ selectList [] [] :: Handler [Entity Entrada]
     layoutPark $ do 
         [whamlet|
+            $maybe mensagem <- msg 
+                <div id="snackbar"> #{mensagem}
+                <script> myFunction();
+                
             <nav>
                 <div class="breadcrumb">
                     <div class="col s12 mdl-color--grey-100">
@@ -61,7 +66,6 @@ getSaidaLiR = do
                                     <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Saída
         |]
 
-
 utcToMinutes :: UTCTime -> UTCTime -> NominalDiffTime
 utcToMinutes a b =  (diffUTCTime  b a) / 60
 
@@ -69,11 +73,12 @@ trunc :: Double -> Int -> Double
 trunc x n = (fromIntegral (floor (x * t))) / t
     where t = 10^n
 
-valor :: Double -> Double -> Double -> NominalDiffTime -> Double
-valor vlMeia vlHora vlDemais minutos
-    | round (minutos) <= 30 && minutos > 0 = trunc vlMeia 2
-    | round (minutos) <= 60 && minutos >= 31 = trunc vlHora 2
-    | round (minutos) > 60 = trunc (realToFrac ((minutos / 60) * (realToFrac vlDemais :: NominalDiffTime) + (realToFrac vlHora :: NominalDiffTime)) :: Double) 2
+valor :: Double -> Double -> Double -> Double -> NominalDiffTime -> Text -> Double
+valor vlMeia vlHora vlDemais vlDia minutos tpentrada
+    | round (minutos) >  60  = trunc (realToFrac ((minutos / 60) * (realToFrac vlDemais :: NominalDiffTime) + (realToFrac vlHora :: NominalDiffTime)) :: Double) 2
+    | round (minutos) <= 60 && minutos >= 31 = trunc vlHora 2 
+    | round (minutos) <= 30 && minutos >  0  = trunc vlMeia 2
+    | round (minutos) >= 1440 && tpentrada == "dia" = trunc (realToFrac ((realToFrac (ceiling ((minutos/60)/24)) :: NominalDiffTime) * (realToFrac vlDia :: NominalDiffTime) + (realToFrac vlHora :: NominalDiffTime)) :: Double)  2
     | otherwise = 0
 
 postSaidaDeR :: EntradaId -> Handler Html 
@@ -85,16 +90,20 @@ postSaidaDeR locsid = do
         Nothing -> do 
             setMessage $ [shamlet| Usuario e/ou senha invalido. |]
             redirect LoginR 
-        Just (Entity entrid (Entrada cliid veiid hrentr)) -> do
-            _ <- runDB $ insert $ Saida (cliid) 
-                                        (veiid) 
-                                        (hrentr) 
-                                        (hrsaida) 
-                                        ( valor 
-                                            (negocioVlmeiahora . entityVal $ negocio)
-                                            (negocioVlhora . entityVal $ negocio)
-                                            (negocioVldemais . entityVal $ negocio)
-                                            (utcToMinutes hrentr hrsaida)
-                                        )
+        Just (Entity _ (Entrada tpentrada cliid veiid hrentr)) -> do
+            Just tipoentradaa <- runDB $ selectFirst [TipoentradaId ==. tpentrada][]
+            sid <- runDB $ insert $ Saida (tpentrada) 
+                                            (cliid) 
+                                            (veiid) 
+                                            (hrentr) 
+                                            (hrsaida) 
+                                            (valor 
+                                                (negocioVlmeiahora . entityVal $ negocio)
+                                                (negocioVlhora . entityVal $ negocio)
+                                                (negocioVldemais . entityVal $ negocio)
+                                                (negocioVldiario . entityVal $ negocio)
+                                                (utcToMinutes hrentr hrsaida)
+                                                (tipoentradaNome . entityVal $ tipoentradaa)
+                                            )
             runDB $ delete locsid
-            redirect SaidaLiR
+            redirect (ImpressaoR sid)
