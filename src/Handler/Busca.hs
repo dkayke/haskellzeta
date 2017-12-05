@@ -18,3 +18,9 @@ data Pesq = Pesq
 formBusca :: Form Pesq
 formBusca = renderDivs $ Pesq
     <$> areq textField "CNH ou placa do veículo" Nothing
+    
+getBuscaR :: Handler Html
+getBuscaR = undefined
+
+postBuscaR :: Handler Html
+postBuscaR = undefined
