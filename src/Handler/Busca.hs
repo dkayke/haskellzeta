@@ -40,5 +40,21 @@ getBuscaR = do
                 <button type="submit" class="mdl-button mdl-button-login mdl-js-button mdl-button--raised">Pesquisar
         |]
 
-postBuscaR :: Handler Html
-postBuscaR = undefined 
+postBuscaR ::  Handler Html
+postBuscaR = do 
+    ((res,_),_) <- runFormPost formBusca
+    case res of
+        FormSuccess dado -> do
+            dadocli <- runDB $ selectFirst ([ClienteCnh ==. (dadopesq dado)] ||. [ClienteNome ==. (dadopesq dado)])[] :: Handler (Maybe (Entity Cliente))
+            dadovei <- runDB $ selectFirst [VeiculoPlaca ==. (dadopesq dado)][] :: Handler (Maybe (Entity Veiculo))
+            case dadocli of
+                Nothing ->
+                    case dadovei of
+                    Nothing -> do
+                        setMessage $ [shamlet| Pesquisa não retornou dados |]
+                        redirect BuscaR
+                    (Just _) -> do
+                        redirect (ResultadoR (dadopesq dado))
+                (Just _) -> do
+                    redirect (ResultadoR (dadopesq dado))
+        _ -> redirect BuscaR
