@@ -7,42 +7,48 @@ Usuario
     
 Cliente
     nome                Text
-    cnh                 Int
-    cpf                 Int
-    dt_nascimento       Day Maybe
-    telefone_1          Int Maybe
-    telefone_2          Int Maybe
+    cnh                 Text
+    dtnascimento        Day
+    telefone1           Int
     deriving Show
-    
+
+Tipoveiculo
+    nome                Text
+    deriving Show
+
 Veiculo
     tipoveic            TipoveiculoId
     placa               Text
     ufplaca             Text
     clienteid           ClienteId
-    modelo              Text Maybe
-    ano                 Int Maybe
-    cor                 Text Maybe
+    modelo              Text
+    ano                 Int
+    cor                 Text
     deriving Show
-    
-Tipoveiculo
-    nome                Text
-    deriving Show
-    
+
 Entrada
+    tipoentradaid       TipoentradaId
     clienteid           ClienteId
     veiculoid           VeiculoId
     hrentrada           UTCTime
-
+    deriving Show
+    
+Tipoentrada
+    nome                Text
+    deriving Show
+    
 Saida
+    tipoentradaid       TipoentradaId
     clienteid           ClienteId
     veiculoid           VeiculoId
     hrentrada           UTCTime
     hrsaida             UTCTime
     vltotal             Double
+    deriving Show
     
 Negocio
     vlhora              Double
     vlmeiahora          Double
     vldiario            Double
     vldemais            Double
-    
+    deriving Show
