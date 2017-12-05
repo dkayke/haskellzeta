@@ -3,16 +3,28 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/                                    IndexR         GET
-/login                               LoginR         GET POST
-/logout                              LogoutR        POST
-/entrada                             EntradaR       GET POST
-/saida                               SaidaLiR       GET
-/saida/#EntradaId                    SaidaDeR       POST
-/negocio                             NegocioR       GET POST
-/cadastro                            CadastroR      GET
-/cadastro/cadCliente                 CadClienteR    GET POST
-/cadastro/cadVeiculo                 CadVeiculoR    GET POST
-/cadastro/buscaCliente               BuscaClienteR  GET
-/cadastro/buscaVeiculo               BuscaVeiculoR  GET
-/cadastro/usuario                    CadUsuario     GET POST
+/                               IndexR          GET
+
+/Erro404                        Erro404R        GET
+
+/busca                          BuscaR          GET POST
+
+/cadastro                       CadastroR       GET
+/cadastro/cadCliente            CadClienteR     GET POST
+/cadastro/cadVeiculo            CadVeiculoR     GET POST
+/cadastro/cadUsuario            CadUsuarioR     GET POST
+
+/entrada                        EntradaR        GET POST
+
+/impressao/saida/#SaidaId       ImpressaoR      GET
+
+/login                          LoginR          GET POST
+/logout                         LogoutR         POST
+
+/negocio                        NegocioR        GET POST
+
+/resultado/#Text                ResultadoR      GET
+/resultado                      ResultadoPR     GET
+
+/saida                          SaidaLiR        GET
+/saida/#EntradaId               SaidaDeR        POST
