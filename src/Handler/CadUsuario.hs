@@ -62,6 +62,18 @@ getCadUsuarioR = do
                     <button class="mdl-button mdl-js-button mdl-button--raised bt-acao">Cadastrar usuário
         |]
 
-
 postCadUsuarioR :: Handler Html
-postCadUsuarioR = undefined
+postCadUsuarioR = do 
+    ((res,_),_) <- runFormPost formUsuario
+    case res of 
+        FormSuccess usuario -> do 
+            loginv <- runDB $ selectFirst [UsuarioLogin ==. usuarioLogin usuario][]
+            case loginv of
+                Just loginusado -> do
+                    setMessage $ [shamlet| Erro, login ja cadastrado no sistema, escolha outro! |]
+                    redirect CadUsuarioR
+                _ -> do
+                    _ <- runDB $ insert usuario
+                    setMessage $ [shamlet| Sucesso, usuário cadastrado! |]
+                    redirect CadUsuarioR
+        _ -> redirect CadUsuarioR
